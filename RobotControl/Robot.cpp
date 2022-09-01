@@ -12,10 +12,12 @@ const uint8_t Robot::STATUS_FIRING = 4;
 
 const unsigned long Robot::TEMP_FIRE_TIME_MILLIS = 100;
 
-Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin) :
+Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress,
+  int fireSolenoidPin. int en, int in1, int in2, uint8_t speed) :
   m_payload(payload),
   m_statusLEDs(pinLedBuiltin),
-  m_commsI2C(i2cHostAddress, i2cDeviceAddress, PREAMBLE_LEN)
+  m_commsI2C(i2cHostAddress, i2cDeviceAddress, PREAMBLE_LEN),
+  m_actuator(en, in1, in2, speed)
 {
   m_initTimeSeconds = 0;
   m_lastRecvIndex = -1;
@@ -38,6 +40,7 @@ void Robot::init() {
 
   m_statusLEDs.setBlinkPattern(StatusLEDs::DISABLED);
   m_commsI2C.init();
+  m_actuator.init();
 }
 
 void Robot::update() {
@@ -71,14 +74,10 @@ void Robot::updateSerial() {
 
   if (m_commsI2C.getBytes(m_serialBuffer, SERIAL_BUFFER_LEN, m_payloadBytes, PAYLOAD_LEN)) {
     updatePayload(m_payloadBytes, PAYLOAD_LEN);
-    //Serial.println("Bytes parsed");
   }
 
   setStatus();
   setRobot();
-  
-  //m_payload.print();
-  //Serial.println();
 }
 
 void Robot::updatePayload(const uint8_t *data, const uint8_t len) {
@@ -110,8 +109,6 @@ void Robot::setRobot() {
     if(millis() - TEMP_FIRE_TIME_MILLIS >= m_solenoidOpenMillis) {
       digitalWrite(m_fireSolenoidPin, LOW);
       m_firing = false;
-      Serial.print("Open for: ");
-      Serial.println(millis() - m_solenoidOpenMillis);
     }
   }
 
@@ -136,12 +133,13 @@ void Robot::setRobot() {
       digitalWrite(m_fireSolenoidPin, HIGH);
       m_solenoidOpenMillis = millis();
       status = STATUS_ADJUSTING;
-      Serial.println("Firing");
       m_firing = true;
       m_isHoldingFire = true;
     }
   }
+
   m_payload.setStatus(status);
+  m_actuator.update(m_payload.getAngle());
 }
 
 void Robot::setStatus() {
@@ -149,11 +147,11 @@ void Robot::setStatus() {
   if(m_payload.getStatus() == STATUS_DISABLED) {
     return;
   }
+
   // Broken here
   if (m_firing) {
     if(millis() - TEMP_FIRE_TIME_MILLIS < m_solenoidOpenMillis) {
       m_payload.setStatus(STATUS_ADJUSTING);
-      Serial.println("Forced adjusting");
     }
   }
 

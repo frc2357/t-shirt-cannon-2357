@@ -6,6 +6,7 @@
 #include <CommsI2CMaster.h>
 #include "StatusLEDs.h"
 #include "Utils.h"
+#include "LinearActuator.h"
 
 #define ROBOT_TICK_DURATION_BUFFER_LEN 5
 #define PAYLOAD_LEN 7
@@ -26,7 +27,7 @@ class Robot
   static const unsigned long TEMP_FIRE_TIME_MILLIS;
 
 public:
-  Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin);
+  Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin, int en, int in1, int in2, uint8_t speed);
 
   void init();
   void update();
@@ -43,6 +44,8 @@ private:
   TShirtCannonPayload &m_payload;
   StatusLEDs m_statusLEDs;
   CommsI2CMaster m_commsI2C;
+  LinearActuator m_actuator;
+  
   int m_initTimeSeconds;
   int m_tickDurations[ROBOT_TICK_DURATION_BUFFER_LEN];
   size_t m_tickDurationsIndex;

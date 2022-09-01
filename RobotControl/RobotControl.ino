@@ -17,22 +17,24 @@
 #define I2C_DEVICE_ADDRESS 0x08
 #define PIN_LED_BUILTIN    LED_BUILTIN
 #define FIRE_SOLENOID_PIN 3
+#define ANGLE_EN 5
+#define ANGLE_IN1 6
+#define ANGLE_IN2 7
+#define ANGLE_SPEED 127
+
 
 // Set up the JSON State for the robot
 TShirtCannonPayload payload;
 
-Robot robot(payload, PIN_LED_BUILTIN, I2C_HOST_ADDRESS, I2C_DEVICE_ADDRESS, FIRE_SOLENOID_PIN);
+Robot robot(payload, PIN_LED_BUILTIN, I2C_HOST_ADDRESS, I2C_DEVICE_ADDRESS, FIRE_SOLENOID_PIN,
+  ANGLE_EN, ANGLE_IN1, ANGLE_IN2, ANGLE_SPEED);
 
 // Primary Setup
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
   if (Serial) {
-    //Serial.print("----------- RobotControl v");
-    //Serial.print(SOFTWARE_VERSION);
-    //Serial.println(" -----------");
   }
   robot.init();
-  //Serial.print("----------- Init complete -----------");
 }
 
 // Main Loop
