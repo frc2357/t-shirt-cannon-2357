@@ -27,7 +27,7 @@ class Robot
   static const unsigned long TEMP_FIRE_TIME_MILLIS;
 
 public:
-  Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin, int en, int in1, int in2, uint8_t speed);
+  Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin, int en, int in1, int in2);
 
   void init();
   void update();

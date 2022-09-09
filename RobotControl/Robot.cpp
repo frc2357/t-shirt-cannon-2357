@@ -13,7 +13,7 @@ const uint8_t Robot::STATUS_FIRING = 4;
 const unsigned long Robot::TEMP_FIRE_TIME_MILLIS = 100;
 
 Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress,
-  int fireSolenoidPin. int en, int in1, int in2, uint8_t speed) :
+  int fireSolenoidPin. int en, int in1, int in2) :
   m_payload(payload),
   m_statusLEDs(pinLedBuiltin),
   m_commsI2C(i2cHostAddress, i2cDeviceAddress, PREAMBLE_LEN),

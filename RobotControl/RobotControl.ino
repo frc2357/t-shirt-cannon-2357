@@ -18,16 +18,15 @@
 #define PIN_LED_BUILTIN    LED_BUILTIN
 #define FIRE_SOLENOID_PIN 3
 #define ANGLE_EN 5
-#define ANGLE_IN1 6
-#define ANGLE_IN2 7
-#define ANGLE_SPEED 127
+#define ANGLE_IN1 10
+#define ANGLE_IN2 9
 
 
 // Set up the JSON State for the robot
 TShirtCannonPayload payload;
 
 Robot robot(payload, PIN_LED_BUILTIN, I2C_HOST_ADDRESS, I2C_DEVICE_ADDRESS, FIRE_SOLENOID_PIN,
-  ANGLE_EN, ANGLE_IN1, ANGLE_IN2, ANGLE_SPEED);
+  ANGLE_EN, ANGLE_IN1, ANGLE_IN2);
 
 // Primary Setup
 void setup() {
