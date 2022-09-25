@@ -12,9 +12,9 @@ LinearActuator::LinearActuator(int en, int in1, int in2, uint8_t speed) {
 }
 
 void LinearActuator::init() {
-    pinMode(en, OUTPUT);
-    pinMode(in1, OUTPUT);
-    pinMode(in2; OUTPUT);
+    pinMode(m_en, OUTPUT);
+    pinMode(m_in1, OUTPUT);
+    pinMode(m_in2, OUTPUT);
 }
 
 void LinearActuator::update(int direction) {
@@ -24,7 +24,7 @@ void LinearActuator::update(int direction) {
         if(direction == EXTEND) {
             extend();
         } else if(direction == RETRACT) {
-            retract()
+            retract();
         } else {
             stop();
         }
