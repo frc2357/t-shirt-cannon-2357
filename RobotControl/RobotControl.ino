@@ -23,11 +23,16 @@
 #define ANGLE_SPEED 1
 
 
-// Set up the JSON State for the robot
 TShirtCannonPayload payload;
 
-Robot robot(payload, PIN_LED_BUILTIN, I2C_HOST_ADDRESS, I2C_DEVICE_ADDRESS, FIRE_SOLENOID_PIN,
-  ANGLE_EN, ANGLE_IN1, ANGLE_IN2, ANGLE_SPEED);
+StatusDisabled disabled;
+StatusEnabled enabled;
+StatusAdjusting adjusting;
+StatusPrimed primed;
+StatusFiring firing;
+
+Robot robot(payload, PIN_LED_BUILTIN, I2C_HOST_ADDRESS, I2C_DEVICE_ADDRESS, FIRE_SOLENOID_PIN, ANGLE_EN, ANGLE_IN1, ANGLE_IN2, ANGLE_SPEED,
+  disabled, enabled, adjusting, primed, firing);
 
 // Primary Setup
 void setup() {

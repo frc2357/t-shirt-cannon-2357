@@ -17,7 +17,6 @@ int RotaryKnobController::getValue()
 {
     this->m_encoder->tick();
     int newPos = this->m_encoder->getPosition();
-    
     //Dials
     if (m_pos != newPos && newPos % 2 == 0)
     {

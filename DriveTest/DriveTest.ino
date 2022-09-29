@@ -4,6 +4,8 @@
 #include "RFM95C.h"
 #include "FTDebouncer.h"
 #include "RotaryEncoder.h"
+#include <SerLCD.h>
+#include "RotaryKnobController.h"
 
 // Pins
 #define JOYSTICK_PIN_VRX 0
@@ -43,8 +45,11 @@ JoystickAxis rightStick(JOYSTICK_PIN_VRX, DEAD_ZONE_SIZE, JOYSTICK_MAX);
 
 uint8_t buf[7];
 
-RotaryEncoder encoder(ENCODER_PIN_A, ENCODER_PIN_B, RotaryEncoder::LatchMode::FOUR3);
+RotaryKnobController encoder(ENCODER_PIN_A, ENCODER_PIN_B);
 
+SerLCD lcd;
+char lcdText[33];
+char strInt[8];
 void setup()
 {
     // ! UNCOMMENT THE LINES BELOW IF USING CONTROLLER
@@ -52,6 +57,13 @@ void setup()
     digitalWrite(POWER_DOWN_PIN, HIGH);
 
     Serial.begin(115200);
+
+    Wire.begin();
+    lcd.begin(Wire);
+    lcd.disableSystemMessages();
+
+    lcd.setBacklight(0, 0, 255);
+    lcd.setContrast(5);
 
     if (!raw_driver.init())
     {
@@ -78,9 +90,9 @@ void setup()
 
 void loop()
 {
-    encoder.tick();
+    payload.setMessageIndex((payload.getMessageIndex() + 1) % 32);
 
-    if (digitalRead(ENCODER_PIN_SW) == 0 && encoder.getPosition() == 10)
+    if (digitalRead(ENCODER_PIN_SW) == 0)
     {
         digitalWrite(POWER_DOWN_PIN, LOW);
     }
@@ -93,34 +105,55 @@ void loop()
     turn = rightStick.getResult();
     speed = leftStick.getResult();
 
-    if (payload.getMessageIndex() + 1 > 31)
-    {
-        payload.setMessageIndex(0);
-    }
-    else
-    {
-        payload.setMessageIndex(payload.getMessageIndex() + 1);
-    }
-
     Utils::setMotors(payload, turn, speed);
+    //Utils::setAngle(payload, encoder);3
 
-    Serial.print("Left motor speed: ");
-    Serial.println(payload.getControllerDriveLeft());
-    Serial.print("Right motor speed: ");
-    Serial.println(payload.getControllerDriveRight());
-    Serial.print("Status: ");
-    Serial.println(payload.getStatus());
+    int dir = encoder.getValue();
+    uint8_t time = payload.getFiringTime();
 
+    memset(lcdText, ' ', 16 * 2);
+
+    if(dir == 1) {
+        if(time + 1 <= 20) {
+            time++;
+            payload.setFiringTime(time);
+
+            itoa((100 + (time * 10)), strInt, 10);
+            memcpy(lcdText, strInt, strlen(strInt));
+            lcd.print(lcdText);
+        }
+    } else if (dir == -1) {
+        if(time - 1 >= 0) {
+            time--;
+            payload.setFiringTime(time);
+
+            itoa((100 + (time * 10)), strInt, 10);
+            memcpy(lcdText, strInt, strlen(strInt));
+            lcd.print(lcdText);
+        }
+    }
     payload.buildTransmission(buf, 7);
 
-    for (int i = 0; i < sizeof(buf); i++)
-    {
-        Serial.println(buf[i], BIN);
-    }
+    // for (int i = 0; i < sizeof(buf); i++)
+    // {
+    //     Serial.println(buf[i], BIN);
+    // }
 
     raw_driver.send(buf, sizeof(buf));
 
-    Serial.println();
+    // Serial.print("Left motor speed: ");
+    // Serial.println(payload.getControllerDriveLeft());
+    // Serial.print("Right motor speed: ");
+    // Serial.println(payload.getControllerDriveRight());
+    // Serial.print("Status: ");
+    // Serial.println(payload.getStatus());
+    // Serial.print("Angle: ");
+    // Serial.println(payload.getAngle());
+    // Serial.print("Encoder value: ");
+    // Serial.println(encoder.getPosition());
+    // Serial.println();
+
+
 }
 
 void onPinActivated(int pinNr)
