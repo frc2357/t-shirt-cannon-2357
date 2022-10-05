@@ -3,16 +3,17 @@
 const int LinearActuator::EXTEND = 1;
 const int LinearActuator::RETRACT = 2;
 
-LinearActuator::LinearActuator(int en, int in1, int in2, uint8_t speed) {
-    m_en = en;
+
+const int LinearActuator::MAX_POS_MILLIS = 8955;
+const int LinearActuator::MIN_POS_MILLIS = 455;
+
+LinearActuator::LinearActuator(int in1, int in2) {
     m_in1 = in1;
     m_in2 = in2;
-    m_speed = speed;
     m_currentDirection = 0;
 }
 
 void LinearActuator::init() {
-    pinMode(m_en, OUTPUT);
     pinMode(m_in1, OUTPUT);
     pinMode(m_in2, OUTPUT);
 }
@@ -29,22 +30,35 @@ void LinearActuator::update(int direction) {
             stop();
         }
     }
+
+    unsigned long currentMillis = millis();
+
+    if(direction == EXTEND) {
+        m_currentPos += currentMillis - m_lastMillis;
+    } else if (direction == RETRACT) {
+        m_currentPos -= currentMillis - m_lastMillis;
+    }
+    m_lastMillis = currentMillis;
+
+    if(m_currentPos < MIN_POS_MILLIS | m_currentPos > MAX_POS_MILLIS) {
+        stop();
+    } 
 }
 
 void LinearActuator::extend() {
+    m_lastMillis = millis();
     digitalWrite(m_in1, HIGH);
     digitalWrite(m_in2, LOW);
-    analogWrite(m_en, m_speed);
 }
 
 void LinearActuator::retract() {
+    m_lastMillis = millis();
     digitalWrite(m_in1, LOW);
     digitalWrite(m_in2, HIGH);
-    analogWrite(m_en, m_speed);
 }
 
 void LinearActuator::stop() {
-    analogWrite(m_en, 0);
-    m_timerMillis = 0;
-    m_startMillis = 0;
+    m_lastMillis = 0;
+    digitalWrite(m_in1, LOW);
+    digitalWrite(m_in2, LOW);
 }

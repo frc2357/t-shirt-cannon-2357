@@ -7,8 +7,11 @@ class LinearActuator {
     static const int EXTEND;
     static const int RETRACT;
 
+    static const int MAX_POS_MILLIS;
+    static const int MIN_POS_MILLIS;
+
 public:
-    LinearActuator(int en, int in1, int in2, uint8_t speed);
+    LinearActuator(int in1, int in2);
     void init();
     void update(int direction);
     void extend();
@@ -16,7 +19,8 @@ public:
     void stop();
 
 private:
-    int m_en, m_in1, m_in2, m_speed, m_currentDirection, m_timerMillis, m_startMillis;
+    int m_in1, m_in2, m_currentDirection, m_currentPos;
+    unsigned long m_lastMillis;
 };
 
 #endif

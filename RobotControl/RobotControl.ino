@@ -17,10 +17,13 @@
 #define I2C_DEVICE_ADDRESS 0x08
 #define PIN_LED_BUILTIN    LED_BUILTIN
 #define FIRE_SOLENOID_PIN 3
-#define ANGLE_EN 5
 #define ANGLE_IN1 10
 #define ANGLE_IN2 9
-#define ANGLE_SPEED 1
+
+// 0.00067 = in/per 
+// 8,955.22388 = milliseconds to max travel
+
+// 455 milliseconds of buffer or 0.3 inches
 
 
 TShirtCannonPayload payload;
@@ -31,7 +34,7 @@ StatusAdjusting adjusting;
 StatusPrimed primed;
 StatusFiring firing;
 
-Robot robot(payload, PIN_LED_BUILTIN, I2C_HOST_ADDRESS, I2C_DEVICE_ADDRESS, FIRE_SOLENOID_PIN, ANGLE_EN, ANGLE_IN1, ANGLE_IN2, ANGLE_SPEED,
+Robot robot(payload, PIN_LED_BUILTIN, I2C_HOST_ADDRESS, I2C_DEVICE_ADDRESS, FIRE_SOLENOID_PIN, ANGLE_IN1, ANGLE_IN2, 
   disabled, enabled, adjusting, primed, firing);
 
 // Primary Setup
