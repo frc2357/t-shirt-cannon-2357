@@ -45,6 +45,10 @@ void LinearActuator::update(int direction) {
     } 
 }
 
+bool LinearActuator::isMoving(int direction) {
+    return direction == EXTEND || direction == RETRACT || m_lastMillis > 0;
+}
+
 void LinearActuator::extend() {
     m_lastMillis = millis();
     digitalWrite(m_in1, HIGH);

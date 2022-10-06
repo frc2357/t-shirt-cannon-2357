@@ -17,6 +17,7 @@ public:
     void extend();
     void retract();
     void stop();
+    bool isMoving(int direction);
 
 private:
     int m_in1, m_in2, m_currentDirection, m_currentPos;

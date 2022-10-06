@@ -156,6 +156,12 @@ void Robot::handleFiring() {
   }
 }
 
+void Robot::handleAngle() {
+  if(m_actuator.isMoving()) {
+    transition(STATUS_ADJUSTING);
+  } 
+}
+
 void Robot::keepAlive() {
   int currentIndex = m_payload.getMessageIndex();
   if (m_lastRecvIndex != currentIndex) {
@@ -198,11 +204,13 @@ void StatusDisabled::update() {
   m_robot->stopDriving();
   m_robot->stopFiring();
   m_robot->m_isHoldingFire = false;
+  m_robot->m_actuator.stop();
 }
 
 void StatusEnabled::validateState() {
   m_robot->keepAlive();
   m_robot->handleFiring();
+  m_robot->handleAngle();
 }
 
 void StatusEnabled::update() {
@@ -219,6 +227,7 @@ void StatusAdjusting::update() {
   if(m_robot->m_firing && millis() >= m_robot->m_solenoidCloseMillis) {
     m_robot->stopFiring();
   }
+  m_robot->m_actuator.update(m_payload->getAngle());
 }
 
 void StatusPrimed::validateState() {
@@ -227,7 +236,7 @@ void StatusPrimed::validateState() {
 }
 
 void StatusPrimed::update() {
-  m_robot->stopDriving();  
+  m_robot->stopDriving();
   m_robot->m_isHoldingFire = false;
 }
 

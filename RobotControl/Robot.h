@@ -72,6 +72,7 @@ private:
   void stopFiring();
   void keepAlive();
   void handleFiring();
+  void handleAngle();
 
   TShirtCannonPayload &m_payload;
   StatusLEDs m_statusLEDs;
