@@ -43,9 +43,14 @@ void LinearActuator::update(int direction) {
     if(m_currentPos < MIN_POS_MILLIS | m_currentPos > MAX_POS_MILLIS) {
         stop();
     } 
+
+    Serial.print("Position: ");
+    Serial.println(m_currentPos);
 }
 
 bool LinearActuator::isMoving(int direction) {
+    Serial.print("Is moving: ");
+    Serial.println((direction == EXTEND || direction == RETRACT || m_lastMillis > 0));
     return direction == EXTEND || direction == RETRACT || m_lastMillis > 0;
 }
 
@@ -53,16 +58,19 @@ void LinearActuator::extend() {
     m_lastMillis = millis();
     digitalWrite(m_in1, HIGH);
     digitalWrite(m_in2, LOW);
+    Serial.println("Extending");
 }
 
 void LinearActuator::retract() {
     m_lastMillis = millis();
     digitalWrite(m_in1, LOW);
     digitalWrite(m_in2, HIGH);
+    Serial.println("Retracting");
 }
 
 void LinearActuator::stop() {
     m_lastMillis = 0;
     digitalWrite(m_in1, LOW);
     digitalWrite(m_in2, LOW);
+    Serial.println("Stopping");
 }
