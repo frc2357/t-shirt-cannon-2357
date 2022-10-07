@@ -157,7 +157,7 @@ void Robot::handleFiring() {
 }
 
 void Robot::handleAngle() {
-  if(m_actuator.isMoving()) {
+  if(m_actuator.isMoving(m_payload.getAngle())) {
     transition(STATUS_ADJUSTING);
   } 
 }
@@ -227,7 +227,7 @@ void StatusAdjusting::update() {
   if(m_robot->m_firing && millis() >= m_robot->m_solenoidCloseMillis) {
     m_robot->stopFiring();
   }
-  m_robot->m_actuator.update(m_payload->getAngle());
+  m_robot->m_actuator.update(m_robot->m_payload.getAngle());
 }
 
 void StatusPrimed::validateState() {
