@@ -3,7 +3,8 @@
 
 #include <Arduino.h>
 
-class LinearActuator {
+class LinearActuator
+{
     static const int EXTEND;
     static const int RETRACT;
 
