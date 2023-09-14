@@ -22,7 +22,6 @@ TShirtCannonPayload::TShirtCannonPayload()
 
 bool TShirtCannonPayload::buildTransmission(uint8_t *transmission, const uint8_t len)
 {
-
     if (len < PAYLOAD_LENGTH)
     {
         Serial.println("Message is not long enough to hold data.");
@@ -31,27 +30,27 @@ bool TShirtCannonPayload::buildTransmission(uint8_t *transmission, const uint8_t
 
     uint8_t data[DATA_LENGTH];
     data[0] = m_messageType;
-    data[1] = m_messageIndex;
-    data[2] = m_status;
-    data[3] = m_error;
-    data[4] = m_firingTime;
-    data[5] = m_controllerDriveLeft;
-    data[6] = m_controllerDriveRight;
-    data[7] = m_batteryVoltage;
-    data[8] = m_angle;
-    data[9] = m_tankPressure;
-    data[10] = m_firingPressure;
+    data[1] = m_status;
+    data[2] = m_error;
+    data[3] = m_firingTime;
+    data[4] = m_controllerDriveLeft;
+    data[5] = m_controllerDriveRight;
+    data[6] = m_batteryVoltage;
+    data[7] = m_angle;
+    data[8] = m_tankPressure;
+    data[9] = m_firingPressure;
+    data[10] = m_messageIndex;
 
     int bitPos = 0;
     int elem = PAYLOAD_LENGTH_LAST_INDEX;
-    for (int i = DATA_LENGTH_LAST_INDEX; i > 0; i--)
+    for (int i = DATA_LENGTH_LAST_INDEX; i >= 0; i--)
     {
         uint8_t attrVal = data[i];
-    
+
         for (int j = 0; j < getAttributeSize(static_cast<AttributeSize>(i)); j++)
         {
             bitWrite(transmission[elem], bitPos, attrVal & 1);
-            
+
             bitPos++;
             attrVal >>= 1;
             if (bitPos >= 8)
@@ -61,13 +60,11 @@ bool TShirtCannonPayload::buildTransmission(uint8_t *transmission, const uint8_t
             }
         }
     }
-
     return true;
 }
 
 bool TShirtCannonPayload::readMessage(const uint8_t *message, const uint8_t len)
 {
-
     uint8_t data[DATA_LENGTH];
     memset(data, 0, sizeof(data));
 
@@ -81,7 +78,7 @@ bool TShirtCannonPayload::readMessage(const uint8_t *message, const uint8_t len)
     int elem = PAYLOAD_LENGTH_LAST_INDEX;
 
     uint8_t attrVal = message[PAYLOAD_LENGTH_LAST_INDEX];
-    for (int i = DATA_LENGTH_LAST_INDEX; i > 0 ; i--)
+    for (int i = DATA_LENGTH_LAST_INDEX; i >= 0; i--)
     {
         for (int j = 0; j < getAttributeSize(static_cast<AttributeSize>(i)); j++)
         {
@@ -97,17 +94,26 @@ bool TShirtCannonPayload::readMessage(const uint8_t *message, const uint8_t len)
         }
     }
 
+    // Make sure only relevant information is updated
     m_messageType = data[0];
-    m_messageIndex = data[1];
-    m_status = data[2];
-    m_error = data[3];
-    m_firingTime = data[4];
-    m_controllerDriveLeft = data[5];
-    m_controllerDriveRight = data[6];
-    m_batteryVoltage = data[7];
-    m_angle = data[8];
-    m_tankPressure = data[9];
-    m_firingPressure = data[10];
+    switch (m_messageType)
+    {
+    case 0:
+        m_batteryVoltage = data[6];
+        m_tankPressure = data[8];
+        m_status = data[1] == 3 ? data[1] : m_status;
+        break;
+    case 1:
+        m_messageIndex = data[10];
+        m_status = data[1];
+        m_firingTime = data[3];
+        m_controllerDriveLeft = data[4];
+        m_controllerDriveRight = data[5];
+        m_angle = data[7];
+        m_firingPressure = data[9];
+        break;
+    }
+    m_error = data[2];
 
     return true;
 }
@@ -116,21 +122,22 @@ uint8_t TShirtCannonPayload::getAttributeSize(AttributeSize attr)
 {
     switch (attr)
     {
-    case AttributeSize::MESSAGE_TYPE:
+    // Comments after cases are possible reductions in size
+    case AttributeSize::MESSAGE_TYPE: // -1
     case AttributeSize::BATTERY_VOLTAGE:
     case AttributeSize::ERROR:
         return 2;
     case AttributeSize::STATUS:
         return 3;
     case AttributeSize::MESSAGE_INDEX:
-    case AttributeSize::FIRING_TIME:
+    case AttributeSize::FIRING_TIME: // -1
         return 5;
-    case AttributeSize::ANGLE:
-    case AttributeSize::TANK_PRESSURE:
-    case AttributeSize::FIRING_PRESSURE:
+    case AttributeSize::ANGLE:           // -5
+    case AttributeSize::TANK_PRESSURE:   // -2
+    case AttributeSize::FIRING_PRESSURE: // -5 | -7
         return 7;
-    case AttributeSize::CONTROLLER_DRIVE_LEFT:
-    case AttributeSize::CONTROLLER_DRIVE_RIGHT:
+    case AttributeSize::CONTROLLER_DRIVE_LEFT:  // -1
+    case AttributeSize::CONTROLLER_DRIVE_RIGHT: // -1
         return 8;
     default:
         return 0;
@@ -154,7 +161,7 @@ void TShirtCannonPayload::print()
 
     Serial.print("Firing Time: ");
     Serial.println(m_firingTime, BIN);
-    
+
     Serial.print("Left Drive: ");
     Serial.println(m_controllerDriveLeft, BIN);
 

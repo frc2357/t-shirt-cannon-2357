@@ -1,8 +1,7 @@
 #include "ElevatorPage.h"
 
-ElevatorPage::ElevatorPage(int increment, int min, int max, unsigned int downArrow,
-                           unsigned int upArrow, unsigned int robotBatChar, unsigned int controllerBatChar)
-    : Page(true, true, downArrow, upArrow, robotBatChar, controllerBatChar, Page::PageType::ELEVATOR_PAGE)
+ElevatorPage::ElevatorPage(int increment, int min, int max)
+    : Page(true, true, Page::PageType::ELEVATOR_PAGE)
 {
     this->m_min = min;
     this->m_max = max;
@@ -13,13 +12,13 @@ void ElevatorPage::paint(DisplayController &display, bool isActivated, TShirtCan
 {
     display.clear();
 
-    display.printRegion(1, 0, "Elevator Angle");
-    display.printRegion(7, 1, String(payload.getAngle()));
+    display.stringSetRegion(1, 0, "Elevator Angle");
+    display.intSetRegion(7, 1, payload.getAngle());
 
     if (isActivated)
     {
-        display.printRegion(6, 1, this->m_upArrow);
-        display.printRegion(9, 1, this->m_downArrow);
+        display.stringSetRegion(6, 1, "^");
+        display.stringSetRegion(9, 1, "v");
     }
 }
 
@@ -28,12 +27,14 @@ void ElevatorPage::clockwise(TShirtCannonPayload &payload)
     uint8_t angle = payload.getAngle();
     angle = angle + this->m_increment;
     angle = rangeFilter(angle);
+    payload.setAngle(angle);
 }
 void ElevatorPage::counterClockwise(TShirtCannonPayload &payload)
 {
     uint8_t angle = payload.getAngle();
     angle = angle - this->m_increment;
     angle = rangeFilter(angle);
+    payload.setAngle(angle);
 }
 
 int ElevatorPage::rangeFilter(int value)

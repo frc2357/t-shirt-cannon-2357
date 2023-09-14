@@ -3,10 +3,12 @@
 const uint8_t RobotComms::PREAMBLE_LEN = 4;
 
 RobotComms::RobotComms(unsigned int radioSS, unsigned int radioINT, unsigned int i2cHostAddress)
- : m_radio(radioSS, radioINT), m_commsI2C(i2cHostAddress, PREAMBLE_LEN, m_payload, PAYLOAD_LEN) {
+    : m_radio(radioSS, radioINT), m_commsI2C(i2cHostAddress, PREAMBLE_LEN, m_payload, PAYLOAD_LEN)
+{
 }
 
-void RobotComms::init(unsigned int radioFreq, void (*recFunction)(int), void (*reqFunction)(void)) {
+void RobotComms::init(unsigned int radioFreq, void (*recFunction)(int), void (*reqFunction)(void))
+{
     if (!m_radio.init())
         Serial.println("radio init failed");
 
@@ -24,21 +26,26 @@ void RobotComms::init(unsigned int radioFreq, void (*recFunction)(int), void (*r
     Serial.println("Finished init");
 }
 
-void RobotComms::update() {
+void RobotComms::update()
+{
     uint8_t payloadLen = PAYLOAD_LEN;
 
-    if (m_radio.recv(m_payload, &payloadLen)) {
+    if (m_radio.recv(m_payload, &payloadLen))
+    {
         Serial.println("Radio message received");
-    } else {
+    }
+    else
+    {
         Serial.println("No radio message");
     }
-    delay(100);
 }
 
-void RobotComms::onI2CReceive(int bytesRead) {
+void RobotComms::onI2CReceive(int bytesRead)
+{
     m_commsI2C.getBytes();
 }
-void RobotComms::onI2CRequest() {
+void RobotComms::onI2CRequest()
+{
     m_commsI2C.sendBytes();
     Serial.println("Data requested");
 }

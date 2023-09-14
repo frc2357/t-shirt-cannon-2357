@@ -9,7 +9,7 @@
 class ShotPage : public Page
 {
 public:
-    ShotPage(int increment, int min, int max, unsigned int downArrow, unsigned int upArrow, unsigned int robotBatChar, unsigned int controllerBatChar);
+    ShotPage(int increment, int min, int max);
     void paint(DisplayController &display, bool isActivated, TShirtCannonPayload &payload);
     void clockwise(TShirtCannonPayload &payload);
     void counterClockwise(TShirtCannonPayload &payload);

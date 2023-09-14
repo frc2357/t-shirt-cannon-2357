@@ -1,8 +1,7 @@
 #include "ValvePage.h"
 
-ValvePage::ValvePage(int increment, int min, int max, unsigned int downArrow, unsigned int upArrow,
-                     unsigned int robotBatChar, unsigned int controllerBatChar)
-    : Page(true, true, downArrow, upArrow, robotBatChar, controllerBatChar, Page::PageType::VALVE_PAGE)
+ValvePage::ValvePage(int increment, int min, int max)
+    : Page(true, true, Page::PageType::VALVE_PAGE)
 {
     this->m_min = min;
     this->m_max = max;
@@ -13,26 +12,28 @@ void ValvePage::paint(DisplayController &display, bool isActivated, TShirtCannon
 {
     display.clear();
 
-    display.printRegion(1, 0, "Valve Duration");
-    display.printRegion(6, 1, String(payload.getFiringTime()));
+    display.stringSetRegion(1, 0, "Valve Duration");
+    display.intSetRegion(6, 1, (payload.getFiringTime() * 10) + 100);
 
     if (isActivated)
     {
-        display.printRegion(5, 1, this->m_downArrow);
-        display.printRegion(9, 1, this->m_upArrow);
+        display.stringSetRegion(5, 1, "^");
+        display.stringSetRegion(9, 1, "v");
     }
 }
 void ValvePage::clockwise(TShirtCannonPayload &payload)
 {
-    uint8_t vlvTm = payload.getFiringTime();
+    int vlvTm = payload.getFiringTime();
     vlvTm = vlvTm + this->m_increment;
     vlvTm = rangeFilter(vlvTm);
+    payload.setFiringTime(vlvTm);
 }
 void ValvePage::counterClockwise(TShirtCannonPayload &payload)
 {
-    uint8_t vlvTm = payload.getFiringTime();
+    int vlvTm = payload.getFiringTime();
     vlvTm = vlvTm - this->m_increment;
     vlvTm = rangeFilter(vlvTm);
+    payload.setFiringTime(vlvTm);
 }
 
 int ValvePage::rangeFilter(int value)

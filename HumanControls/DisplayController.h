@@ -2,22 +2,22 @@
 #define DISPLAYCONTROLLER_H
 
 #include <Wire.h>
-#include <LiquidCrystal_I2C.h>
+#include <SerLCD.h>
 #include <Arduino.h>
-#include "CharacterDisplay.h"
 
-class DisplayController : CharacterDisplay
+class DisplayController
 {
 public:
-    DisplayController(unsigned int displayAddress, unsigned int displayLen, unsigned int displayWidth);
-    void init(unsigned int downArrow, unsigned int upArrow);
+    void init();
     void clear();
-    void printRegion(int x, int y, String text);
-    void printRegion(int x, int y, int code);
-    void printBattery(int x, int y, int code, double level);
-    byte isFilled(double level, double threshold);
+    void stringSetRegion(int x, int y, const char *text);
+    void intSetRegion(int x, int y, int num);
+    void print();
 
 private:
-    LiquidCrystal_I2C m_lcd;
+    SerLCD m_lcd;
+    char m_lcdText[33];
+    char m_strInt[8];
+    bool m_hasChanged;
 };
 #endif
