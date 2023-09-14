@@ -1,8 +1,7 @@
 #include "ShotPage.h"
 
-ShotPage::ShotPage(int increment, int min, int max, unsigned int downArrow, unsigned int upArrow,
-                   unsigned int robotBatChar, unsigned int controllerBatChar)
-    : Page(true, true, downArrow, upArrow, robotBatChar, controllerBatChar, Page::PageType::SHOT_PAGE)
+ShotPage::ShotPage(int increment, int min, int max)
+    : Page(true, true, Page::PageType::SHOT_PAGE)
 {
     this->m_min = min;
     this->m_max = max;
@@ -13,23 +12,23 @@ void ShotPage::paint(DisplayController &display, bool isActivated, TShirtCannonP
 {
     display.clear();
 
-    display.printRegion(1, 0, "Shot Pressure");
-    display.printRegion(0, 1, "F:");
+    display.stringSetRegion(1, 0, "Shot Pressure");
+    display.stringSetRegion(0, 1, "F:");
 
-    display.printRegion(3, 1, String(payload.getFiringPressure()));
-    display.printRegion(11, 1, "T:");
-    display.printRegion(13, 1, String(payload.getTankPressure()));
+    display.intSetRegion(3, 1, payload.getFiringPressure());
+    display.stringSetRegion(11, 1, "T:");
+    display.intSetRegion(13, 1, payload.getTankPressure());
 
     if (isActivated)
     {
-        display.printRegion(2, 1, this->m_downArrow);
+        display.stringSetRegion(2, 1, "v");
         if (payload.getFiringPressure() >= 100)
         {
-            display.printRegion(6, 1, this->m_upArrow);
+            display.stringSetRegion(6, 1, "^");
         }
         else
         {
-            display.printRegion(5, 1, this->m_upArrow);
+            display.stringSetRegion(5, 1, "^");
         }
     }
 }
@@ -39,12 +38,14 @@ void ShotPage::clockwise(TShirtCannonPayload &payload)
     uint8_t frPres = payload.getFiringPressure();
     frPres = frPres + this->m_increment;
     frPres = rangeFilter(frPres);
+    payload.setFiringPressure(frPres);
 }
 void ShotPage::counterClockwise(TShirtCannonPayload &payload)
 {
     uint8_t frPres = payload.getFiringPressure();
     frPres = frPres - this->m_increment;
     frPres = rangeFilter(frPres);
+    payload.setFiringPressure(frPres);
 }
 
 int ShotPage::rangeFilter(int value)

@@ -1,10 +1,7 @@
 #include "MenuController.h"
 
-MenuController::MenuController(unsigned int encoderPinClk,
-                               unsigned int encoderPinDt,
-                               unsigned int displayAddress,
-                               unsigned int displayLen,
-                               unsigned int displayWidth,
+MenuController::MenuController(unsigned int encoderPinA,
+                               unsigned int encoderPinB,
                                unsigned int angleIncrement,
                                unsigned int angleMin,
                                unsigned int angleMax,
@@ -14,20 +11,13 @@ MenuController::MenuController(unsigned int encoderPinClk,
                                unsigned int durationIncrement,
                                unsigned int durationMin,
                                unsigned int durationMax,
-                               unsigned int hangTimerDuration,
-                               unsigned int downArrow,
-                               unsigned int upArrow,
-                               unsigned int robotBatChar,
-                               unsigned int controllerBatChar)
-    : m_rotaryKnob(encoderPinClk, encoderPinDt), m_display(displayAddress, displayLen, displayWidth),
-      m_dashPage(downArrow, upArrow, robotBatChar, controllerBatChar),
-      m_elevatorPage(angleIncrement, angleMin, angleMax, downArrow, upArrow, robotBatChar,
-                     controllerBatChar),
-      m_shotPage(pressureIncrement, pressureMin, pressureMax, downArrow, upArrow, robotBatChar,
-                 controllerBatChar),
-      m_valvePage(durationIncrement, durationMin, durationMax, downArrow, upArrow, robotBatChar,
-                  controllerBatChar),
-      m_debugPage(downArrow, upArrow, robotBatChar, controllerBatChar)
+                               unsigned int hangTimerDuration)
+    : m_rotaryKnob(encoderPinA, encoderPinB), m_display(),
+      m_dashPage(),
+      m_elevatorPage(angleIncrement, angleMin, angleMax),
+      m_shotPage(pressureIncrement, pressureMin, pressureMax),
+      m_valvePage(durationIncrement, durationMin, durationMax),
+      m_debugPage()
 {
     this->m_isActive = false;
 
@@ -53,10 +43,9 @@ MenuController::MenuController(unsigned int encoderPinClk,
     this->m_time = millis();
 }
 
-void MenuController::init(TShirtCannonPayload &payload, unsigned int downArrow, unsigned int upArrow)
+void MenuController::init(TShirtCannonPayload &payload)
 {
-    Serial.println("Menu Init");
-    this->m_display.init(downArrow, upArrow);
+    this->m_display.init();
     payload.setFiringTime(this->m_valvePage.rangeFilter(payload.getFiringTime()));
     payload.setAngle(this->m_elevatorPage.rangeFilter(payload.getAngle()));
     payload.setFiringPressure(this->m_shotPage.rangeFilter(payload.getFiringPressure()));
@@ -87,6 +76,11 @@ void MenuController::menuUpdate(TShirtCannonPayload &payload, bool isEnabled)
         {
             this->m_currentPage->counterClockwise(payload);
         }
+
+        if (this->m_rotation != 0)
+        {
+            this->m_currentPage->paint(m_display, m_isActive, payload);
+        }
     }
     else
     {
@@ -101,7 +95,7 @@ void MenuController::menuUpdate(TShirtCannonPayload &payload, bool isEnabled)
         }
     }
 
-    if (this->m_rotation != 0)
+    if (this->m_rotation != 0 && payload.getStatus() == Utils::ControllerStatus::DISABLED)
     {
         this->m_time = millis();
         this->m_currentPage->cleanUp(m_display);
@@ -115,6 +109,8 @@ void MenuController::menuUpdate(TShirtCannonPayload &payload, bool isEnabled)
         this->m_currentPage->cleanUp(m_display);
         this->m_currentPage->paint(m_display, m_isActive, payload);
     }
+
+    m_display.print();
 }
 
 void MenuController::menuPress(TShirtCannonPayload &payload, bool isEnabled)
@@ -126,7 +122,10 @@ void MenuController::menuPress(TShirtCannonPayload &payload, bool isEnabled)
     }
     else
     {
+        this->m_currentPage = &m_dashPage;
         this->m_isActive = false;
+        this->m_currentPage->cleanUp(m_display);
+        this->m_currentPage->paint(m_display, m_isActive, payload);
     }
     this->m_currentPage->paint(m_display, m_isActive, payload);
 }

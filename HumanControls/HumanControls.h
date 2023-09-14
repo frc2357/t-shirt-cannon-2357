@@ -1,5 +1,5 @@
-#ifndef HUMAN_CONTROLS
-#define HUMAN_CONTROLS
+#ifndef HUMAN_CONTROLS_H
+#define HUMAN_CONTROLS_H
 
 #include <Arduino.h>
 #include <JsonElement.h>
@@ -8,16 +8,16 @@
 #include "EnableController.h"
 #include "FireController.h"
 #include "JoystickAxis.h"
+#include "RFM95C.h"
+#include "Utils.h"
+#include "CommunicationDriver.h"
 
 class HumanControls
 {
 public:
     HumanControls(TShirtCannonPayload &payload,
-                  unsigned int encoderPinClk,
-                  unsigned int encoderPinDt,
-                  unsigned int displayAddress,
-                  unsigned int displayLen,
-                  unsigned int displayWidth,
+                  unsigned int encoderPinA,
+                  unsigned int encoderPinB,
                   unsigned int angleIncrement,
                   unsigned int angleMin,
                   unsigned int angleMax,
@@ -28,10 +28,6 @@ public:
                   unsigned int durationMin,
                   unsigned int durationMax,
                   unsigned int hangTimerDuration,
-                  unsigned int downArrow,
-                  unsigned int upArrow,
-                  unsigned int robotBatChar,
-                  unsigned int controllerBatChar,
                   unsigned int numButtons,
                   unsigned int encoderPinSW,
                   unsigned int primePin,
@@ -42,24 +38,19 @@ public:
                   unsigned int joystickMax,
                   unsigned int joystickPinVRY,
                   unsigned int yDeadZoneSize);
-    void init(unsigned int downArrow, unsigned int upArrow);
-    void update();
+    void init();
+    void update(uint8_t *messageBuffer);
     void setStatus();
     void onPinActivated(int pinNr);
     void onPinDeactivated(int pinNr);
-    void connect();
 
-    static const uint8_t STATUS_DISABLED;
-    static const uint8_t STATUS_ENABLED;
-    static const uint8_t STATUS_PRIMED;
-    static uint8_t status;
+    static Utils::ControllerStatus status;
 
 private:
     void setError(const char *format, ...);
 
     int m_encoderPinSW, m_enablePin, m_primePin, m_firePin;
-    bool m_isConnected;
-    static uint8_t lastStatus;
+    static Utils::ControllerStatus lastStatus;
 
     TShirtCannonPayload &m_payload;
 

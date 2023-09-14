@@ -1,8 +1,6 @@
 #include "DashPage.h"
 
-DashPage::DashPage(unsigned int downArrow, unsigned int upArrow, unsigned int robotBatChar,
-                   unsigned int controllerBatChar) : Page(true, false, downArrow, upArrow, robotBatChar, controllerBatChar,
-                                                          Page::PageType::DASH_PAGE)
+DashPage::DashPage() : Page(true, false, Page::PageType::DASH_PAGE)
 {
 }
 
@@ -12,33 +10,34 @@ void DashPage::paint(DisplayController &display, bool isActivated, TShirtCannonP
 
     if (isActivated)
     {
-        display.printRegion(0, 0, "ERROR: " + String(payload.getError()));
+        display.stringSetRegion(0, 0, "ERROR: ");
+        display.intSetRegion(7, 0, payload.getError());
     }
     else
     {
         if (payload.getError() != 0)
         {
-            display.printRegion(0, 0, "ERROR");
+            display.stringSetRegion(0, 0, "ERROR");
         }
         else
         {
-            display.printRegion(0, 0, "Status: " + String(payload.getStatus()));
-            Serial.println(payload.getStatus());
+            display.stringSetRegion(0, 0, "Status:");
+            display.intSetRegion(7, 0, payload.getStatus());
         }
 
-        display.printRegion(12, 0, "R");
-        display.printBattery(13, 0, this->m_robotBatChar, payload.getBatteryVoltage() * 100.0);
-        display.printRegion(14, 0, "C");
-        display.printBattery(15, 0, this->m_controllerBatChar, 30.0);
+        display.stringSetRegion(9, 0, "R:");
+        display.intSetRegion(11, 0, payload.getBatteryVoltage());
+        display.stringSetRegion(13, 0, "C:");
+        display.intSetRegion(15, 0, 5);
 
-        display.printRegion(0, 1, "A:");
-        display.printRegion(2, 1, String(payload.getAngle()));
+        display.stringSetRegion(0, 1, "A:");
+        display.intSetRegion(2, 1, payload.getAngle());
 
-        display.printRegion(5, 1, "P:");
-        display.printRegion(7, 1, String(payload.getFiringPressure()));
+        display.stringSetRegion(5, 1, "P:");
+        display.intSetRegion(7, 1, payload.getFiringPressure());
 
-        display.printRegion(11, 1, "D:");
-        display.printRegion(13, 1, String(payload.getFiringTime()));
+        display.stringSetRegion(11, 1, "D:");
+        display.intSetRegion(13, 1, (payload.getFiringTime() * 10) + 100);
     }
 }
 

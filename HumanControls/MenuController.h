@@ -1,5 +1,5 @@
-#ifndef MENUCONTROLLER_H
-#define MENUCONTROLLER_H
+#ifndef MENU_CONTROLLER_H
+#define MENU_CONTROLLER_H
 
 #include <Arduino.h>
 #include <JsonElement.h>
@@ -11,17 +11,14 @@
 #include "DebugPage.h"
 #include "RotaryKnobController.h"
 #include "DisplayController.h"
-#include "FireController.h"
 #include "TShirtCannonPayload.h"
+#include "Utils.h"
 
 class MenuController
 {
 public:
-    MenuController(unsigned int encoderPinClk,
-                   unsigned int encoderPinDt,
-                   unsigned int displayAddress,
-                   unsigned int displayLen,
-                   unsigned int displayWidth,
+    MenuController(unsigned int encoderPinA,
+                   unsigned int encoderPinB,
                    unsigned int angleIncrement,
                    unsigned int angleMin,
                    unsigned int angleMax,
@@ -31,12 +28,8 @@ public:
                    unsigned int durationIncrement,
                    unsigned int durationMin,
                    unsigned int durationMax,
-                   unsigned int hangTimerDuration,
-                   unsigned int downArrow,
-                   unsigned int upArrow,
-                   unsigned int robotBatChar,
-                   unsigned int controllerBatChar);
-    void init(TShirtCannonPayload &payload, unsigned int downArrow, unsigned int upArrow);
+                   unsigned int hangTimerDuration);
+    void init(TShirtCannonPayload &payload);
     void menuUpdate(TShirtCannonPayload &payload, bool isEnabled);
     void menuRefresh(TShirtCannonPayload &payload);
     void menuPress(TShirtCannonPayload &payload, bool isEnabled);

@@ -9,8 +9,7 @@
 class ElevatorPage : public Page
 {
 public:
-    ElevatorPage(int increment, int min, int max, unsigned int downArrow, unsigned int upArrow,
-                 unsigned int robotBatChar, unsigned int controllerBatChar);
+    ElevatorPage(int increment, int min, int max);
     void paint(DisplayController &display, bool isActivated, TShirtCannonPayload &payload);
     void clockwise(TShirtCannonPayload &payload);
     void counterClockwise(TShirtCannonPayload &payload);

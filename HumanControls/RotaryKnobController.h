@@ -6,7 +6,7 @@
 class RotaryKnobController
 {
 public:
-    RotaryKnobController(unsigned int pinClk, unsigned int pinDt);
+    RotaryKnobController(unsigned int pinA, unsigned int pinB);
     ~RotaryKnobController();
     int getValue();
 
