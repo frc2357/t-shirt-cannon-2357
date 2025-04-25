@@ -1,5 +1,4 @@
 #include "HumanControls.h"
-#include "Utils.h"
 
 Utils::ControllerStatus HumanControls::status = Utils::ControllerStatus::DISABLED;
 Utils::ControllerStatus HumanControls::lastStatus = Utils::ControllerStatus::DISABLED;
@@ -86,13 +85,12 @@ void HumanControls::setStatus()
 
             // Send an extra payload with the FIRING status
             // This is to ensure we aren't missing the signal to fire on the robot side
-            if (!m_hasSentSecondFirePayload) 
+            if (!m_hasSentSecondFirePayload)
             {
                 status = Utils::ControllerStatus::FIRING;
                 m_hasSentSecondFirePayload = true;
-                Serial.println("Extra firing payload");
             }
-            else if (m_enableController.getIsEnabled())
+            else if (m_enableController.getIsEnabled() || m_menuController.isDrivePageEnabled())
             {
                 if (m_fireController.getIsPrimed())
                 {
@@ -123,6 +121,15 @@ void HumanControls::setStatus()
         lastStatus = status;
         m_payload.setStatus(status);
         m_menuController.menuRefresh(m_payload);
+    }
+    if (m_payload.getStatus() == Utils::ControllerStatus::DISABLED && m_enableController.getIsEnabled())
+    {
+        m_enableController.setIsEnabled(false);
+        m_fireController.setIsPrimed(false);
+    }
+    else if (m_payload.getStatus() != Utils::ControllerStatus::PRIMED && m_fireController.getIsPrimed())
+    {
+        m_fireController.setIsPrimed(false);
     }
 }
 
@@ -176,9 +183,12 @@ void HumanControls::onPinDeactivated(int pinNr)
 
     if (pinNr == m_enablePin)
     {
-        m_enableController.setIsEnabled(false);
-        m_fireController.setIsPrimed(false);
-        m_payload.setAngle(1);
+        if (!m_menuController.isDrivePageEnabled())
+        {
+            m_enableController.setIsEnabled(false);
+            m_fireController.setIsPrimed(false);
+            m_payload.setAngle(1);
+        }
     }
     else if (pinNr == m_encoderPinSW)
     {

@@ -9,6 +9,7 @@
 #include "ShotPage.h"
 #include "ValvePage.h"
 #include "DebugPage.h"
+#include "DrivePage.h"
 #include "RotaryKnobController.h"
 #include "DisplayController.h"
 #include "TShirtCannonPayload.h"
@@ -34,6 +35,8 @@ public:
     void menuRefresh(TShirtCannonPayload &payload);
     void menuPress(TShirtCannonPayload &payload, bool isEnabled);
 
+    bool isDrivePageEnabled();
+
 private:
     RotaryKnobController m_rotaryKnob;
     DisplayController m_display;
@@ -46,5 +49,6 @@ private:
     ShotPage m_shotPage;
     DebugPage m_debugPage;
     ValvePage m_valvePage;
+    DrivePage m_drivePage;
 };
 #endif

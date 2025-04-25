@@ -14,16 +14,17 @@ void ElevatorPage::paint(DisplayController &display, bool isActivated, TShirtCan
 
     display.stringSetRegion(1, 0, "Elevator Angle");
 
-    switch (payload.getAngle()) {
-        case 0:
-            display.stringSetRegion(7, 1, "vv");
-            break;
-        case 2:
-            display.stringSetRegion(7, 1, "^^");
-            break;
-        default:
-            display.stringSetRegion(7, 1, "--");
-            break;
+    switch (payload.getAngle())
+    {
+    case 0:
+        display.stringSetRegion(7, 1, "vv");
+        break;
+    case 2:
+        display.stringSetRegion(7, 1, "^^");
+        break;
+    default:
+        display.stringSetRegion(7, 1, "--");
+        break;
     }
 
     if (isActivated)
@@ -46,6 +47,10 @@ void ElevatorPage::counterClockwise(TShirtCannonPayload &payload)
     angle = angle - this->m_increment;
     angle = rangeFilter(angle);
     payload.setAngle(angle);
+}
+
+void ElevatorPage::onLeave(TShirtCannonPayload &payload)
+{
 }
 
 int ElevatorPage::rangeFilter(int value)

@@ -24,6 +24,10 @@ void DebugPage::counterClockwise(TShirtCannonPayload &payload)
     return;
 }
 
+void DebugPage::onLeave(TShirtCannonPayload &payload)
+{
+}
+
 int DebugPage::rangeFilter(int value)
 {
     return 0;

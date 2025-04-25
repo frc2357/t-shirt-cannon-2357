@@ -50,6 +50,10 @@ void DashPage::counterClockwise(TShirtCannonPayload &payload)
     return;
 }
 
+void DashPage::onLeave(TShirtCannonPayload &payload)
+{
+}
+
 int DashPage::rangeFilter(int value)
 {
     return 0;

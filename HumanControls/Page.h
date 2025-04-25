@@ -16,7 +16,8 @@ public:
         ELEVATOR_PAGE = 1,
         SHOT_PAGE = 2,
         VALVE_PAGE = 3,
-        DEBUG_PAGE = 4
+        DEBUG_PAGE = 4,
+        DRIVE_PAGE = 5
     };
 
     Page(bool isActive, bool applyHang, Page::PageType name);
@@ -24,6 +25,7 @@ public:
     virtual void paint(DisplayController &display, bool isActivated, TShirtCannonPayload &payload) = 0;
     virtual void clockwise(TShirtCannonPayload &payload) = 0;
     virtual void counterClockwise(TShirtCannonPayload &payload) = 0;
+    virtual void onLeave(TShirtCannonPayload &payload) = 0;
     virtual int rangeFilter(int value) = 0;
     bool canActivate();
     void setNextPage(Page &page);
