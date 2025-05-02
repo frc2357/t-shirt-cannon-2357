@@ -49,7 +49,8 @@ public:
 private:
     void setError(const char *format, ...);
 
-    bool m_hasSentSecondFirePayload;
+    // Default to true so it doesn't try to fire on startup
+    bool m_hasSentSecondFirePayload = true;
 
     int m_encoderPinSW, m_enablePin, m_primePin, m_firePin;
     static Utils::ControllerStatus lastStatus;

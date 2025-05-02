@@ -48,6 +48,10 @@ void ShotPage::counterClockwise(TShirtCannonPayload &payload)
     payload.setFiringPressure(frPres);
 }
 
+void ShotPage::onLeave(TShirtCannonPayload &payload)
+{
+}
+
 int ShotPage::rangeFilter(int value)
 {
     if (value < this->m_min)

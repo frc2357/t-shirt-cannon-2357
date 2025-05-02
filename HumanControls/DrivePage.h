@@ -1,21 +1,23 @@
-#ifndef DASH_PAGE_H
-#define DASH_PAGE_h
+#ifndef DRIVE_PAGE_H
+#define DRIVE_PAGE_H
 
 #include "Page.h"
-#include <Arduino.h>
-#include <JsonElement.h>
-#include "TShirtCannonPayload.h"
 #include "Utils.h"
 
-class DashPage : public Page
+class DrivePage : public Page
 {
 public:
-    DashPage();
+    DrivePage();
     void paint(DisplayController &display, bool isActivated, TShirtCannonPayload &payload);
     void clockwise(TShirtCannonPayload &payload);
     void counterClockwise(TShirtCannonPayload &payload);
     void onLeave(TShirtCannonPayload &payload);
     int rangeFilter(int value);
+
+    bool isEnabled();
+
+private:
+    bool m_isDrivingEnabled = false;
 };
 
-#endif
+#endif // DRIVE_PAGE_H

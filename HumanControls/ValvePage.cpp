@@ -21,6 +21,7 @@ void ValvePage::paint(DisplayController &display, bool isActivated, TShirtCannon
         display.stringSetRegion(9, 1, "v");
     }
 }
+
 void ValvePage::clockwise(TShirtCannonPayload &payload)
 {
     int vlvTm = payload.getFiringTime();
@@ -28,12 +29,17 @@ void ValvePage::clockwise(TShirtCannonPayload &payload)
     vlvTm = rangeFilter(vlvTm);
     payload.setFiringTime(vlvTm);
 }
+
 void ValvePage::counterClockwise(TShirtCannonPayload &payload)
 {
     int vlvTm = payload.getFiringTime();
     vlvTm = vlvTm - this->m_increment;
     vlvTm = rangeFilter(vlvTm);
     payload.setFiringTime(vlvTm);
+}
+
+void ValvePage::onLeave(TShirtCannonPayload &payload)
+{
 }
 
 int ValvePage::rangeFilter(int value)

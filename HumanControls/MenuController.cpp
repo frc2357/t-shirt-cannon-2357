@@ -17,25 +17,28 @@ MenuController::MenuController(unsigned int encoderPinA,
       m_elevatorPage(angleIncrement, angleMin, angleMax),
       m_shotPage(pressureIncrement, pressureMin, pressureMax),
       m_valvePage(durationIncrement, durationMin, durationMax),
-      m_debugPage()
+      m_debugPage(),
+      m_drivePage()
 {
     this->m_isActive = false;
 
     this->m_rotation = 0;
 
     // Set previous pages
-    m_dashPage.setPreviousPage(m_debugPage);
+    m_dashPage.setPreviousPage(m_drivePage);
     m_elevatorPage.setPreviousPage(m_dashPage);
     m_shotPage.setPreviousPage(m_elevatorPage);
     m_valvePage.setPreviousPage(m_shotPage);
     m_debugPage.setPreviousPage(m_valvePage);
+    m_drivePage.setPreviousPage(m_debugPage);
 
     // Set next pages
     m_dashPage.setNextPage(m_elevatorPage);
     m_elevatorPage.setNextPage(m_shotPage);
     m_shotPage.setNextPage(m_valvePage);
     m_valvePage.setNextPage(m_debugPage);
-    m_debugPage.setNextPage(m_dashPage);
+    m_debugPage.setNextPage(m_drivePage);
+    m_drivePage.setNextPage(m_dashPage);
 
     m_currentPage = &m_dashPage;
 
@@ -64,8 +67,9 @@ void MenuController::menuRefresh(TShirtCannonPayload &payload)
 void MenuController::menuUpdate(TShirtCannonPayload &payload, bool isEnabled)
 {
     this->m_rotation = this->m_rotaryKnob.getValue();
+    bool drivePageEnabled = this->isDrivePageEnabled();
 
-    if (m_isActive && isEnabled)
+    if (m_isActive && (isEnabled && !drivePageEnabled))
     {
         if (this->m_rotation == 1)
         {
@@ -87,17 +91,21 @@ void MenuController::menuUpdate(TShirtCannonPayload &payload, bool isEnabled)
         if (this->m_rotation == 1)
         {
             this->m_isActive = false;
+            this->m_currentPage->onLeave(payload);
             this->m_currentPage = this->m_currentPage->getNextPage();
         }
 
         if (this->m_rotation == -1)
         {
             this->m_isActive = false;
+            this->m_currentPage->onLeave(payload);
             this->m_currentPage = this->m_currentPage->getPreviousPage();
         }
     }
 
-    if (this->m_rotation != 0 && payload.getStatus() == Utils::ControllerStatus::DISABLED)
+    if (this->m_rotation != 0 &&
+        (payload.getStatus() == Utils::ControllerStatus::DISABLED ||
+         (payload.getStatus() == Utils::ControllerStatus::ENABLED && drivePageEnabled)))
     {
         this->m_time = millis();
         this->m_currentPage->cleanUp(m_display);
@@ -106,6 +114,7 @@ void MenuController::menuUpdate(TShirtCannonPayload &payload, bool isEnabled)
 
     if (this->m_currentPage->applyHang() && millis() > (this->m_time + this->m_hangTimerDuration))
     {
+        this->m_currentPage->onLeave(payload);
         this->m_currentPage = &m_dashPage;
         this->m_isActive = false;
         this->m_currentPage->cleanUp(m_display);
@@ -129,10 +138,16 @@ void MenuController::menuPress(TShirtCannonPayload &payload, bool isEnabled)
     }
     else
     {
+        this->m_currentPage->onLeave(payload);
         this->m_currentPage = &m_dashPage;
         this->m_isActive = false;
         this->m_currentPage->cleanUp(m_display);
         this->m_currentPage->paint(m_display, m_isActive, payload);
     }
     this->m_currentPage->paint(m_display, m_isActive, payload);
+}
+
+bool MenuController::isDrivePageEnabled()
+{
+    return this->m_currentPage->getName() == this->m_drivePage.getName() && this->m_drivePage.isEnabled();
 }
